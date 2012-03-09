@@ -44,13 +44,15 @@ class User
   end
 end
 
-to_fetch = ["rortian"]
+to_fetch = %w(rortian)
 
 to_fetch.each do |name|
   Neo4j::Transaction.run do
     current = User.find_or_create name
     current.fetch_following["users"].each do |following|
-      current.following << User.find_or_create(name)
+      current.following << User.find_or_create(following)
     end
   end
 end
+
+binding.pry
