@@ -10,23 +10,47 @@ Neo4j::Config[:storage_path] = "neo4j"
 
 class User
   include Neo4j::NodeMixin
+  property :name
+
+  has_n :followers
+
+  has_n :following
 
   index :name
 
-  def followers(user)
+  rule :all
+
+  def fetch_followers
     r = HTTPI::Request.new
-    r.url = "http://github.com/api/v2/json/user/show/#{user}/followers"
+    r.url = "http://github.com/api/v2/json/user/show/#{name}/followers"
     res = HTTPI.get r
     JSON.parse res.body
   end
 
-  def following(user)
+  def fetch_following
     r = HTTPI::Request.new
-    r.url = "http://github.com/api/v2/json/user/show/#{user}/following"
+    r.url = "http://github.com/api/v2/json/user/show/#{name}/following"
     res = HTTPI.get r
     JSON.parse res.body
   end
 
+  def self.find_or_create(name)
+    finding = self.find("name: #{name}")
+    if(finding.size == 0)
+      self.new :name => name
+    else
+      finding.first
+    end
+  end
 end
 
-binding.pry
+to_fetch = ["rortian"]
+
+to_fetch.each do |name|
+  Neo4j::Transaction.run do
+    current = User.find_or_create name
+    current.fetch_following["users"].each do |following|
+      current.following << User.find_or_create(name)
+    end
+  end
+end
