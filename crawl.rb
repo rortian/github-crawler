@@ -51,6 +51,10 @@ User.all.each do |u|
   end
 end
 
+HTTPI.log = false
+
+Thread.new do 
+
 while(to_visit.size > 0)
 
   name = to_visit.to_a.sample
@@ -72,4 +76,8 @@ while(to_visit.size > 0)
   
 
 end
+
+end
+
+binding.pry
 
