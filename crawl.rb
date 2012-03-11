@@ -53,7 +53,14 @@ end
 
 HTTPI.log = false
 
-Thread.new do 
+def crawl(&block)
+  Thread.new do
+    block.call
+  end
+  block
+end
+
+yo = crawl do 
 
 while(to_visit.size > 0)
 
@@ -76,8 +83,8 @@ while(to_visit.size > 0)
   
 
 end
-
 end
+
 
 binding.pry
 
