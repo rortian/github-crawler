@@ -61,28 +61,22 @@ def crawl(&block)
 end
 
 yo = crawl do 
-
-while(to_visit.size > 0)
-
-  name = to_visit.to_a.sample
-
-  Neo4j::Transaction.run do
-    current = User.find_or_create name
-    current.fetch_following["users"].each do |following|
-      user = User.find_or_create(following)
-      current.following << user
-      if(!user.visited)
-        to_visit << user.name
+  while(to_visit.size > 0)
+    name = to_visit.to_a.sample
+    Neo4j::Transaction.run do
+      current = User.find_or_create name
+      current.fetch_following["users"].each do |following|
+        user = User.find_or_create(following)
+        current.following << user
+        if(!user.visited)
+          to_visit << user.name
+        end
       end
-    end
-    current.visited = true
-    to_visit -= [name]
+      current.visited = true
+      to_visit -= [name]
   end
-
   sleep 1
-  
-
-end
+  end
 end
 
 
