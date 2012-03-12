@@ -79,6 +79,18 @@ yo = crawl do
   end
 end
 
+crawled = User.all.size - to_visit.size
+
+monitor = Thread.new do
+  while true
+    sleep 60
+    now_crawled = User.all.size - to_visit.size
+    if(now_crawled == crawled)
+      crawl &yo
+    end
+    crawled = now_crawled
+  end
+end
 
 binding.pry
 
