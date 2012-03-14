@@ -65,7 +65,7 @@ yo = crawl do
     name = to_visit.to_a.sample
     Neo4j::Transaction.run do
       current = User.find_or_create name
-      current.fetch_following["users"].each do |following|
+      current.fetch_following["users"].uniq.each do |following|
         user = User.find_or_create(following)
         current.following << user
         if(!user.visited)
@@ -82,7 +82,7 @@ end
 crawled = User.all.size - to_visit.size
 
 monitor = Thread.new do
-  while true
+  while (to_visit.size > 0 )
     sleep 60
     now_crawled = User.all.size - to_visit.size
     if(now_crawled == crawled)
