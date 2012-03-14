@@ -1,2 +1,4 @@
 .*.sw*
 neo4j/*
+http.log
+trivia/*
